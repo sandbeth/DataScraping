@@ -1,0 +1,177 @@
+---
+title: "MGT4050 Business Analytics"
+author: "Karthik Babu Nattamai Kannan"
+date: '`r Sys.Date()`'
+output:
+  word_document:
+    toc: no
+  html_notebook:
+    highlight: tango
+    toc: yes
+    toc_float:
+      collapsed: no
+  html_document:
+    toc: yes
+subtitle: HW 1
+---
+
+# Set working directoryLoad libraries
+Let us start by installing and loading tidyr package. If you plan on running or testing code dirctly in command line, then set working directory outside of code chunk like...
+
++ setwd('/Volumes/DataHD/Dropbox/teaching/2017-Spring/teaching_material/r_workspace/HW1')
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo = TRUE)
+#For each .Rmd file we need to set the directory it is operating under so that we can reference other files in different locations. My project location is '/Users/bdcoe/Documents/Data_KB/GT/2017_Spring/BA/r_workspace/' and I have '02_data_wrangling' folder under it with R files and CSV files. So, I am setting my working directory to '/Users/bdcoe/Documents/Data_KB/GT/2017_Spring/BA/r_workspace/02_data_wrangling/'
+install.packages("knitr")
+knitr::opts_knit$set(root.dir = 'C:/vishal/GT/MGT4050/Hw1')
+
+# The easiest way to get tidyr is to install the whole tidyverse:
+#install.packages("tidyverse", repos="http://cran.rstudio.com/")
+#install.packages("sqldf", repos="http://cran.rstudio.com/")
+install.packages("ineq", repos="http://cran.rstudio.com/")
+
+# Alternatively, install just tidyr:
+#install.packages("tidyr")
+
+# Or the the development version from GitHub:
+# install.packages("devtools")
+#devtools::install_github("tidyverse/tidyr")
+
+#After installing, we need to call the package to make it available to R
+library(tidyverse)
+library(sqldf)
+library(rvest)
+library(ineq)
+```
+# Goals, Guidelines and Hints
+  1. You need to know how to use (CSS selectors)[http://www.w3schools.com/cssref/css_selectors.asp] . Carefully study the example given in class that scraped data from imdb.com, tripadvisor.com etc.
+  2. You will have to do string manipulation in this HW. I suggest using the package `stringr`. Please look at the help and vignette to learn and do by yourself. Learning a new R package by yourself is an important skill that needs to be developed. I am hoping this HW will train you in this aspect.
+  3. You will be tested in the usage of serveral R packages including ineq, rvest, tidyverse (dplyr, stringr etc.). If you need clarifications, look at the R Help or cheatsheets.
+  4. Discussion within group is allowed. However, you cannot copy the final code from others. You can discuss concepts and ask for clarifications on other examples. I would also need you to note down the team member with whom you discussed and brief nature of discussions.
+  5. Due date: 13th Feb 2017 @ 11:30 PM
+  6. What to submit:
+      + Make a zip with the name `GTid_hw1.zip
+      + Zip should contain an .Rmd file (you can just modify this one with your output), your processed datasets in .Rdata format. The .Rmd file should have working code snippets that should be executable in any other machine just by changing the base directory.
+      + Use the `knit` option to convert your .Rmd file to a word document. This word document should have my questions, your explanations, code snippets, and output of your analysis. I will primarily grade your work based on the word document.
+      + For more help in formatting your .Rmd file, look at (R Markdown)[http://rmarkdown.rstudio.com/]. This is the one of the latest and greatest output format used in Data Science.
+
+# Questions
+1. [50 points] Scrape data from (slickdeals)[https://slickdeals.net/]
+    + For every deal in the front page, get
+        + Store selling the product
+        + Price
+        + Number of likes (thumbs up)
+        + Number of comments
+    + Combine all the above data in a R dataframe
+    + You need to clean your dataset first!
+        + Price - Keep only those records that represent a `$` amount. For example, `80K Points`, `Extra 20% off`, `From $5.35` should be filtered out. Your goal is to only retain those observations that have a price associated with it. If it is stated as `Free`, then assign a value of `$0` to it. Remove other characters like `+` in `$2+`.
+    + Compute the following
+        + Group by Store and find
+            + Average Price
+            + Maximum Price
+            + Distinct number of comments
+            + Variance of number of comments
+            + Median of number of likes
+        + Draw a histogram of number of likes and comments. Use the `hist` function.
+        + Find the correlation between likes and comments. Use the `cor` function.
+        + Find the correlation between likes and price. Use the `cor` function.
+2.  [50 points] Now, you will work with 2 datasets `Census_by_zip.csv` and `us_postal_codes.csv`. The former contains demographic details of each zip code. The latter contains the state, county, and lat/long for each zip. Note that in both cases Zip is stored as a number. Now, do the following
+      + Import Census_by_zip.csv
+      + Compute the overall summary staistics using the 'summary' function. In your own words, describe the descriptive statistics for 2 variables that you think are interesting
+      + Compute the Gini coeffecient for Millennials and Income_lt_50K. What is your interpretation of the coefficient?
+      + Create Lorentz curve for Millennials and Income_lt_50K. Interpret results.
+      + Import `us_postal_codes.csv`
+      + Join the two tables based on zip code
+      + Now, group the dataset at the county level
+      + Compute the average, maximum, and minimum Hispianic population for each county.
+      + Sort by descending order of average value. Which county has the highest average Hispianic population?
+      + Export the results as a csv file `hisp_by_county.zip`
+        
+
+```{r}
+# Sandeep Bethapudi 
+html <- read_html("https://slickdeals.net/")
+
+store <- html_nodes(html, " #pageContent .itemStore") 
+html_text(store)
+store <- (html_nodes(html, " span .itemStore"))
+
+price <- html_nodes(html, " #pageContent .itemPrice") 
+html_text(price)
+price <- html_nodes(html, "span.itemPrice")
+
+like <- store %>% html_nodes(html, " #pageContent .likesLabel .count") 
+html_text(likes)
+like <- (html_nodes(html, " span .likesLabel span .count "))
+
+
+comments <- like %>% html_nodes(html, " #pageContent .track-fpDealLink .count") 
+html_text(comments)
+comments <- (html_nodes(html, " span .track-fpDealLink span .count "))
+
+
+```
+
+```{r}
+deals <- 
+
+```
+
+
+```{r}
+Census_by_zip <- read_csv("./Census_by_zip.csv")
+
+str(Census_by_zip)
+
+```
+```{r}
+save(Census_by_zip,file='./Census_by_zip.RData')
+load('./Census_by_zip.RData')
+```
+
+```{r}
+Census_by_zip %>%
+  summarize(mean_midincome_pop = mean(`Income_50to100K`),
+            mean_adult_pop = mean(`18plus_Population`))
+# the mean of both Income_50to100k and 18plus_Population were chosen and computed to approximate the size of "middle class" in comparison to the population from all zips
+```
+
+```{r}
+  Millennials_pop <- Census_by_zip  $Millennials
+  Income_lt_50k_pop <- Census_by_zip  $Income_lt_50K
+
+  gini_Mill <- ineq(Millennials_pop, type = "Gini")
+
+  gini_Income_lt_50k_pop <- ineq(Income_lt_50k_pop, type = "Gini")
+  
+  # the gini coeff is 0.68 to 0.66 for Millennials and those in income less than 50 k             respctively. That means the Millennials abd low income earners are hard hit income inequality 
+
+```
+
+```{r}
+Census_by_zip 
+  plot(Lc(Millennials_pop))
+  plot(Lc(Income_lt_50k_pop))
+  # the Millennials' Lorenz curve shows their share of income is little more unequal.
+```
+
+```{r}
+us_postal_codes <- read_csv("./us_postal_codes.csv", col_names = TRUE, cols("Postal Code" = col_integer()))
+str(us_postal_codes)
+```
+
+```{r}
+join_data <- inner_join(Census_by_zip, us_postal_codes, by = c("ZipCode" = "Postal Code"))
+
+group_county <- join_data %>% 
+                group_by(County) %>%
+                summarise(meanHisp_county = mean(`Hispanic`),
+                          maxHisp_county = max(`Hispanic`),
+                           minHisp_county = min(`Hispanic`))
+
+des_ord_hisp <- group_county[order(- select(group_county, meanHisp_county)),]
+max_hisp <- select(group_county, maxHisp_county)
+
+# Bronx has highest hispanic population
+```
